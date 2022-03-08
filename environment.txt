@@ -1,0 +1,12 @@
+download flutter extract to any location
+copy location and add to environment variable path
+https://docs.flutter.dev/get-started/install
+
+download and install android studio
+    ->https://developer.android.com/studio
+    -> add flutter and dart plugin 
+
+
+
+open command prompt and type :  flutter doctor 
+
