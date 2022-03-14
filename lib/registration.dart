@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:myworkshop/login.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 class register extends StatefulWidget {
   const register({Key? key}) : super(key: key);
@@ -76,9 +78,39 @@ class _registerState extends State<register> {
                 SizedBox(height: 10,),
                 RaisedButton(
                   child: Text("Register"),
-                    onPressed: (){
+                    onPressed: ()async{
 
                       //start validation
+
+                      final database = openDatabase(
+
+                          join(await getDatabasesPath(), 'workshop.db'),
+
+                          onCreate: (db, version) {
+                      // Run the CREATE TABLE statement on the database.
+                      return db.execute(
+                      'CREATE TABLE Register(id INTEGER PRIMARY KEY, email TEXT, username TEXT, password TEXT)',
+                      );
+                      },
+                      // Set the version. This executes the onCreate function and provides a
+                      // path to perform database upgrades and downgrades.
+                      version: 1,
+                      );
+
+                      var email = _email.text;
+                      var username = _username.text;
+                      var pass = _password.text;
+                      final db = await database;
+                      db.rawQuery("insert into Register(email,username,password)values('$email','$username','$pass')");
+
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("User Registered Successfully.")));
+
+                      setState(() {
+                        _email.text = '';
+                        _username.text = '';
+                        _password.text = '';
+                        _conpass.text = '';
+                      });
 
 
                       //do Registration API calling process
