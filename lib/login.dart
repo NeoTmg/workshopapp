@@ -1,6 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:myworkshop/dashboard.dart';
 import 'package:myworkshop/registration.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' as path;
+import 'global.dart';
 
 
 class login extends StatefulWidget {
@@ -87,9 +91,36 @@ class _loginState extends State<login> {
 
                   RaisedButton(
                       child: Text("Login"),
-                      onPressed: (){
+                      onPressed: ()async{
                          //now first getting login credentials
+                        final database = openDatabase(
 
+                            path.join(await getDatabasesPath(), 'workshop.db'),
+
+                            onCreate: (db, version) {
+                        // Run the CREATE TABLE statement on the database.
+                        return db.execute(
+                        'CREATE TABLE Register(id INTEGER PRIMARY KEY, email TEXT, username TEXT, password TEXT)',
+                        );
+                        },
+                        version: 1,
+                        );
+
+                        final db = await database;
+                        var email = _email.text;
+                        var pass = _pass.text;
+                        List<Map> result = [];
+                        result = await db.rawQuery("select * from Register where email='$email' and password = '$pass'");
+                        print(result);
+                        if(result.length == 0){
+                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Invalid Username and Password.")));
+
+                        }else{
+                          global.email = _email.text;
+                          global.isLogin = true;
+                          global.username = result[0]['username'];
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
+                        }
 
                       
                       }
